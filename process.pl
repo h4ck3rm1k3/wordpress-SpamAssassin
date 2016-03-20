@@ -21,7 +21,7 @@ my %setup_args = (
     dont_copy_prefs      => 0,
     force_ipv4           => 0,
     local_tests_only     => 0,
-    debug                => 1,
+    #debug                => 1,
     paranoid             => 1,
     require_rules        => 1,
     skip_prng_reseeding  => 1,  # let us do the reseeding by ourselves
@@ -48,12 +48,15 @@ foreach my $post (@{$posts}) {
 	    my $srcip = $comment->{'wp:comment_author_IP'}[0];
 	    #warn  $maild;
 
-
+	    my $l = length($maild);
+	    if ($l > 80) {
+		$l = 80;
+	    }
 	    my $mmsg = MIME::Lite::->new(
 		'To'      => 'comments@pirate-party.com',
 		'From'    => $email,
-		'Subject' => 'Comment:' .  substr(40,$maild),
-		'Type' => "text/plain",
+		'Subject' => 'Comment:' .  substr($maild, $l),
+		'Type' => "text/html",
 		'Data' => $maild . " URL: ".  $curl,	       
 		);
 
@@ -78,12 +81,14 @@ foreach my $post (@{$posts}) {
 	    my $w = 128;
 
 	    $maild =~ s/\n/ /g;
+	    my $report = $email . ":". substr($maild,0,$w);
+	    
 	    if ($msg->is_spam()){
-		warn "SPAM: " . substr($maild,0,$w);
+		warn "SPAM: " . $report;
 	    }
 	    else
 	    {
-		warn "NOTSPAM: " . substr($maild,0,$w);
+		warn "NOTSPAM: " . $report;
 	    }
 
 	}
